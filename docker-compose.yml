@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  bot:
+    build: bot
+    ports:
+      - 80:80
+    depends_on:
+      - db
+    env_file:
+      - settings.env
+    command: ["./wait-for-postgres.sh", "db", "python", "run.py"]
+  db:
+    image: postgres
+    env_file:
+      - settings.env
