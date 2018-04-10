@@ -8,6 +8,7 @@ POSTGRES_DB = os.environ.get('POSTGRES_DB')
 TOKEN = os.environ.get('TOKEN')
 GOD_ID = os.environ.get('GOD_ID')
 GOD_NAME = os.environ.get('GOD_NAME')
+MAX_SUM = os.environ.get('MAX_SUM')
 
 db = PostgresqlDatabase(
     POSTGRES_DB,

@@ -24,15 +24,19 @@ class Account(Model):
     def approve(self, transaction):
         if transaction.acceptor is not None:
             raise TransactionUsed()
-        if transaction.actor is self:
+        if transaction.actor == self:
             raise SelfTransaction()
 
-        transaction.acceptor = self
+        if self.user.role != Role.SHOP:
+            acceptor = self
+        else:
+            acceptor = User.get(User.tg_id == 0).account.get()
+
+        transaction.acceptor = acceptor
         transaction.approve_time = datetime.datetime.now()
-        if user.role != Role.SHOP:
-            self.score += transaction.amount
+        acceptor.score += transaction.amount
         try:
-            self.save()
+            acceptor.save()
             transaction.save()
         except Exception as e:
             logger.error(e)

@@ -9,6 +9,8 @@ services:
       - db
     env_file:
       - settings.env
+    volumes:
+      - ./bot/:/bot
     command: ["./wait-for-postgres.sh", "db", "python", "run.py"]
   db:
     image: postgres

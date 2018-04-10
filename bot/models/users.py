@@ -26,18 +26,22 @@ class User(Model):
     tg_id = IntegerField(unique=True)
     username = CharField(null=True)
     role = RoleField(default=Role.USER)
-    # challenge = ForeignKeyField(Challenge, default=None, null=True)
+    challenge = DeferredForeignKey('Challenge',
+                                   default=None,
+                                   null=True,
+                                   backref="kp")
 
     class Meta:
         database = db
-        # constraints = [Check('challenge == None or role == 2')]
+        # constraints = [Check('challenge_id == None or role == 2')]
 
 
-# class Challenge(Model):
-#     name = CharField()
-#     admin = ForeignKeyField(User, backref="own_challenge", null=True)
-#     amount = IntegerField()
-#     crazy = BooleanField(default=False)
-#
-#     class Meta:
-#         database = db
+class Challenge(Model):
+    name = CharField()
+    admin = ForeignKeyField(User, backref="own_challenge", null=False)
+    amount = IntegerField()
+    finished = BooleanField(default=False)
+    crazy = BooleanField(default=False)
+
+    class Meta:
+        database = db
