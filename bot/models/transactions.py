@@ -11,29 +11,14 @@ from bot.models.accounts import Account
 
 class Transaction(Model):
     uuid = UUIDField(default=uuid4, unique=True)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    amount = IntegerField(constraints=[Check('amount > 0')])
-=======
     amount = IntegerField()
->>>>>>> 81feaea... Bot release v0.1.0
-=======
-    amount = IntegerField(constraints=[Check('amount > 0'), Check('amount < 5000')])
->>>>>>> dd5d13a... Another temp commit, but may be not
     actor = ForeignKeyField(Account, backref='payments')
     acceptor = ForeignKeyField(Account, backref='profits', null=True,
                                default=None)
     created_time = DateTimeField(default=datetime.datetime.now)
     approve_time = DateTimeField(default=None, null=True)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     generated = BooleanField(default=False)
     exchanged = BooleanField(default=False)
->>>>>>> 81feaea... Bot release v0.1.0
-=======
-    generated = BooleanField(default=False)
->>>>>>> d96046c... Last temp commit :)
 
     def to_qr(self):
         qr = qrcode.make(Cipher.encrypt(self.uuid.bytes))
