@@ -141,7 +141,7 @@ def approve(bot, update):
     tg_user = update.effective_user
     user = User.get(User.tg_id == tg_user.id)
     if user.role == Role.GOD:
-        cash = exchange_coins2cash(transaction, god)
+        cash = exchange_coins2cash(transactions[0], god)
         bot.send_message(chat_id=update.message.chat_id,
                          text="Give %d cash" % cash)
         return
@@ -314,7 +314,7 @@ def transaction(bot, update):
         account = user.account.get()
         if account.score < amount:
             bot.send_message(chat_id=update.message.chat_id,
-                             text="Not enougth CMCoins",
+                             text="Not enough CMCoins",
                              reply_markup=user_keyboard)
             return
         with db.atomic() as txn:
@@ -495,7 +495,7 @@ def get_challenge_info(bot, update, args):
             challenge = Challenge.get(Challenge.name == challenge_name)
         except DoesNotExist:
             bot.send_message(chat_id=update.message.chat_id,
-                             text="Didn't find {}".format(name))
+                             text="Didn't find {}".format(challenge_name))
             continue
         admin = challenge.admin
         kps = [kp.username for kp in challenge.kp]
@@ -513,7 +513,8 @@ def finish(bot, update, args):
         challenge = Challenge.get(Challenge.name == challenge_name)
     except DoesNotExist:
         bot.send_message(chat_id=update.message.chat_id,
-                         text="Didn't find {}".format(name))
+                         text="Didn't find {}".format(challenge_name))
+        return
     admin = challenge.admin
     global god
     with db.atomic() as txn:
@@ -546,7 +547,7 @@ def status(bot, update):
 
 
 @restricted(Role.GOD)
-def change_costs(bot, updates, args):
+def change_costs(bot, update, args):
     try:
         op = getattr(operator, args[0])
     except AttributeError:
@@ -572,6 +573,7 @@ def exchange(bot, update, args):
     except ValueError:
         bot.send_message(chat_id=update.message.chat_id,
                          text="Wrong format!\n/exchange value")
+        return
     update.message.text = amount
     transaction(bot, update)
 
@@ -583,7 +585,7 @@ def get_challenge_info(bot, update, args):
             challenge = Challenge.get(Challenge.name == challenge_name)
         except DoesNotExist:
             bot.send_message(chat_id=update.message.chat_id,
-                             text="Didn't find {}".format(name))
+                             text="Didn't find {}".format(challenge_name))
             continue
         admin = challenge.admin
         kps = [kp.username for kp in challenge.kp]
@@ -592,33 +594,7 @@ def get_challenge_info(bot, update, args):
 
 
 @restricted(Role.GOD)
-def finish(bot, update, args):
-    if len(args) != 1:
-        bot.send_message(chat_id=update.message.chat_id,
-                         text="Wrong format!\n/finish challenge_name")
-    challenge_name = args[0]
-    try:
-        challenge = Challenge.get(Challenge.name == challenge_name)
-    except DoesNotExist:
-        bot.send_message(chat_id=update.message.chat_id,
-                         text="Didn't find {}".format(name))
-    admin = challenge.admin
-    with db.atomic() as txn:
-        challenge.finished = True
-        challenges_status = [challenge.finished for
-                             challenge in admin.own_challenge]
-        if True not in challenges_status:
-            global god
-            _make_user(god, admin)
-            bot.send_message(chat_id=admin.tg_id, text="You become user")
-    bot.send_message(chat_id=admin.tg_id,
-                     text="Challenge %s finished" % challenge.name)
-    bot.send_message(chat_id=update.message.chat_id,
-                     text="Success")
-
-
-@restricted(Role.GOD)
-def state(bot, update):
+def status(bot, update):
     global GENERATED_SUM
     crew = User.get(User.tg_id == 0)
     balance = crew.account.get().score
