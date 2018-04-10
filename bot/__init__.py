@@ -120,6 +120,7 @@ def exchange_coins2cash(transaction, god):
     transaction.approve_time = datetime.datetime.now()
     transaction.save()
     EXCHANGED_SUM += transaction.amount
+    return transaction.amount
 
 
 def approve(bot, update):
