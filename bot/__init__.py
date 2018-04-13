@@ -595,15 +595,6 @@ def get_challenge_info(bot, update, args):
 
 
 @restricted(Role.GOD)
-def status(bot, update):
-    global GENERATED_SUM
-    crew = User.get(User.tg_id == 0)
-    balance = crew.account.get().score
-    bot.send_message(chat_id=update.message.chat_id,
-                     text="Shop balance: {shop_balance}\nGenerated: {generated}".format(shop_balance=balance, generated=GENERATED_SUM))
-
-
-@restricted(Role.GOD)
 def sleep(bot, update, args):
     from time import sleep
     sleep(args[0])
